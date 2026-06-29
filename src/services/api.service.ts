@@ -6,16 +6,32 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+export interface PaginatedResponse<T> {
+  data: T[];
+  nextCursor: string | null;
+  total: number;
+}
+
 // Medical Records
 export const fetchRecords = (patientAddress: string) =>
   api.get<MedicalRecord[]>('/records', { params: { patientAddress } }).then((r) => r.data);
+
+export const fetchRecordsPaginated = (patientAddress: string, cursor?: string, limit = 10) =>
+  api.get<PaginatedResponse<MedicalRecord>>('/records', {
+    params: { patientAddress, cursor, limit },
+  }).then((r) => r.data);
 
 export const shareRecord = (recordId: string, providerAddress: string) =>
   api.post<ShareToken>(`/records/${recordId}/share`, { providerAddress }).then((r) => r.data);
 
 // Doctors & Slots
-export const fetchDoctors = (specialty?: string) =>
-  api.get<Doctor[]>('/doctors', { params: specialty ? { specialty } : {} }).then((r) => r.data);
+export const fetchDoctors = (specialty?: string, signal?: AbortSignal) =>
+  api.get<Doctor[]>('/doctors', { params: specialty ? { specialty } : {}, signal }).then((r) => r.data);
+
+export const fetchDoctorPatientsPaginated = (doctorAddress: string, cursor?: string, limit = 10) =>
+  api.get<PaginatedResponse<{ name: string; initials: string; age: number; lastVisit: string; status: string; records: number; addr: string }>>('/doctors/patients', {
+    params: { doctorAddress, cursor, limit },
+  }).then((r) => r.data);
 
 export const fetchSlots = (doctorId: string) =>
   api.get<TimeSlot[]>(`/doctors/${doctorId}/slots`).then((r) => r.data);
