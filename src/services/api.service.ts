@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { MedicalRecord, ShareToken, Doctor, TimeSlot, Appointment, NewRecordPayload, EncryptedRecord } from '@/types';
+import { MedicalRecord, ShareToken, Doctor, TimeSlot, Appointment, NewRecordPayload, EncryptedRecord, StaffMember, PatientAdmission, HospitalMetrics, ComplianceReport } from '@/types';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -44,3 +44,23 @@ export const uploadEncryptedRecord = (formData: FormData) =>
   api.post<EncryptedRecord>('/records/encrypted', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   }).then((r) => r.data);
+
+// Hospital — metrics, staff, admissions, compliance
+export const fetchHospitalMetrics = (hospitalAddress: string) =>
+  api.get<HospitalMetrics>('/hospital/metrics', { params: { hospitalAddress } }).then((r) => r.data);
+
+export const fetchStaff = (hospitalAddress: string) =>
+  api.get<StaffMember[]>('/hospital/staff', { params: { hospitalAddress } }).then((r) => r.data);
+
+export const fetchAdmissions = (hospitalAddress: string) =>
+  api.get<PatientAdmission[]>('/hospital/admissions', { params: { hospitalAddress } }).then((r) => r.data);
+
+export const fetchComplianceReports = (hospitalAddress: string) =>
+  api.get<ComplianceReport[]>('/hospital/compliance', { params: { hospitalAddress } }).then((r) => r.data);
+
+export const bulkUpdateStaff = (
+  hospitalAddress: string,
+  staffIds: string[],
+  action: 'activate' | 'deactivate' | 'remove'
+) =>
+  api.post('/hospital/staff/bulk', { hospitalAddress, staffIds, action }).then((r) => r.data);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -8,6 +8,8 @@ import {
   ChevronRight, ShieldCheck, ArrowLeft, Loader2,
   CheckCircle2, Wallet
 } from 'lucide-react';
+import { useWalletStore } from '@/store/useWalletStore';
+import { ROLE_DASHBOARD_MAP } from '@/hooks/useRoleRedirect';
 
 type Role = 'PATIENT' | 'DOCTOR' | 'HOSPITAL';
 
@@ -49,9 +51,16 @@ const trustPoints = [
 
 export default function LoginPage() {
   const router = useRouter();
+  const { publicKey, role: walletRole } = useWalletStore();
   const [step, setStep] = useState<'role' | 'wallet'>('role');
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [connecting, setConnecting] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (publicKey && walletRole) {
+      router.replace(ROLE_DASHBOARD_MAP[walletRole] ?? '/dashboard/patient');
+    }
+  }, [publicKey, walletRole, router]);
 
   function handleRoleSelect(role: Role) {
     setSelectedRole(role);
