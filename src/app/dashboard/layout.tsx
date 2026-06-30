@@ -9,6 +9,7 @@ import {
   Stethoscope, Users, Bell, ChevronDown,
   Hospital, ClipboardList, ShieldCheck, Menu, X,
 } from 'lucide-react';
+import NotificationBell from '@/components/navigation/NotificationBell';
 import { useWalletStore } from '@/store/useWalletStore';
 import { useAuthStore } from '@/store/authStore';
 import { Avatar } from '@/components/ui/Avatar';
